@@ -7,7 +7,7 @@
 # Tested on: SLES 11, SLES 12, SLES 15
 #####
 
-- hosts: APPLinuxSophos
+- hosts: LinuxServers
   vars_files: 
             - secret
   gather_facts: no
