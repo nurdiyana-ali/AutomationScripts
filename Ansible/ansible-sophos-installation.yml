@@ -1,0 +1,47 @@
+---
+#####
+# Created by:   Nurdiyana Md Ali
+# Purpose:      Automating the installation of Sophos AntiVirus
+# Revision:     v 1.0
+# Instruction: Replace the IP address, FQDN and hostname as needed
+# Tested on: SLES 11, SLES 12, SLES 15
+#####
+
+- hosts: APPLinuxSophos
+  vars_files: 
+            - secret
+  gather_facts: no
+  tasks:
+            - name: Download Sophos Installer to /tmp directory
+              get_url:
+                url: http://[ip]/sophos/SophosInstall.sh
+                dest: /tmp/
+                mode: '0755'
+
+            - name: Append the Sophos download server to the /etc/hosts
+              lineinfile:
+                path: /etc/hosts
+                line: "[IP]\t[FQDN]\t[hostname]"
+              become: yes
+              become_user: root
+              become_method: sudo
+            
+            - name: Run Sophos Installer script
+              shell: ./SophosInstall.sh >> SophosInstallLog.txt 2>&1
+              args: 
+                chdir: /tmp/
+              become: yes
+              become_user: root
+              become_method: sudo
+            
+            - name: Remove the Sophos Installer from the /tmp directory
+              file:
+                path: /tmp/SophosInstall.sh
+                state: absent
+
+            - name: Gather all Services facts
+              service_facts:
+
+            - name: Display status of Sophos AV process
+              debug:
+                var: ansible_facts.services["sav-protect.service"]
