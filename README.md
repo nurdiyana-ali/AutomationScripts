@@ -1,2 +1,2 @@
 # AutomationScripts
-Collection of tested Ansible, Expect and BASH scripts
+Collection of tested Ansible, PowerShell, Expect and BASH scripts
