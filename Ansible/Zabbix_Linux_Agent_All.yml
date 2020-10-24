@@ -1,0 +1,178 @@
+---
+#####
+# Created by:     Nurdiyana Md Ali
+# Purpose:        Automating the installation of Zabbix 5.0 agent defined 
+#                 according to Linux distribution and OS version,
+#                 configuration of the agent and starting the service
+# Revision:       v 2.0
+# Supported OS:   Red Hat:  RHEL 7, RHEL 8
+#                 CentOS:   CentOS 7, CentOS 8
+#                 SLES:     SLES 12, SLES 15
+#                 Ubuntu:   Ubuntu 16.04 LTS, Ubuntu 18.04 LTS, Ubuntu 20.04 LTS
+#####
+- hosts: ZabbixAgentLinuxHosts
+  vars_files:
+          - secret
+  vars:
+          platform: "{{ ansible_distribution }} {{ ansible_distribution_major_version }}"
+  become: yes
+  become_user: root
+  become_method: sudo
+  tasks:
+
+# Remove all unsupported platform at the beginning of the playbook 
+          - name: check if server is running a supported distro
+            fail: 
+                  msg: "{{ platform }} is unsupported platform!"
+            when: platform not in ["SLES 15", "SLES_SAP 15", "SLES_SAP 12", "SLES 12" "CentOS 7", "CentOS 8", "RedHat 7", "RedHat 8", "Ubuntu 16", "Ubuntu 18", "Ubuntu 20" ]
+
+# Directly perform installation if RHEL/CentOS 7
+          - name: Install RHEL/CentOS 7 files
+            block:
+              - name: Install the Release file in the server
+                command: rpm -i http://172.17.2.138/Zabbix_RHEL7/zabbix-release-5.0-1.el7.noarch.rpm
+
+              - name: Install the Zabbix agent
+                command: rpm -i http://172.17.2.138/Zabbix_RHEL7/zabbix-agent-5.0.4-1.el7.x86_64.rpm
+            when: platform in ["CentOS 7", "RedHat 7"]
+
+# Directly perform installation if RHEL/CentOS 8
+          - name: Directly Install RHEL/CentOS 8 files
+            block:
+              - name: Install the Release file in the server
+                command: rpm -i http://192.168.62.128/Zabbix_RHEL8/zabbix-release-5.0-1.el8.noarch.rpm
+
+              - name: Install the Zabbix agent
+                command: rpm -i http://192.168.62.128/Zabbix_RHEL8/zabbix-agent-5.0.4-1.el8.x86_64.rpm
+            when: platform in ["CentOS 8", "RedHat 8"]
+
+# Directly perform installation if SLES 12
+          - name: Directly Install SLES 12 files
+            block:
+              - name: Install the Release file in the server
+                command: rpm -i http://172.17.2.138/Zabbix_SLES12/zabbix-release-5.0-1.el12.noarch.rpm
+
+              - name: Install the Zabbix agent
+                command: rpm -i http://172.17.2.138/Zabbix_SLES12/zabbix-agent-5.0.4-1.el12.x86_64.rpm
+            when: platform in ["SLES 12", "SLES_SAP 12"]
+
+# Directly perform installation if SLES 15
+          - name: Directly Install SLES 12 files
+            block:
+              - name: Install the Release file in the server
+                command: rpm -i http://172.17.2.138/Zabbix_SLES15/zabbix-release-5.0-1.el15.noarch.rpm
+
+              - name: Install the Zabbix agent
+                command: rpm -i http://172.17.2.138/Zabbix_SLES15/zabbix-agent-5.0.4-1.el15.x86_64.rpm
+            when: platform in ["SLES 15", "SLES_SAP 15"]
+
+# Download files, perform installation if Ubuntu 16.04           
+          - name: Copy and Install Ubuntu 16 files
+            block:
+              - name: Download the packages
+                get_url: 
+                        url: http://172.17.2.138/Zabbix_Ubuntu16/{{ item }}
+                        dest: /tmp/
+                        mode: 0755
+                with_items:
+                - zabbix-release_5.0-1+xenial_all.deb
+                - zabbix-agent_5.0.4-1+xenial_amd64.deb
+
+              - name: Install the Release file in the server
+                command: dpkg -i /tmp/zabbix-release_5.0-1+xenial_all.deb
+
+              - name: Install the Zabbix agent
+                command: dpkg -i /tmp/zabbix-agent_5.0.4-1+xenial_amd64.deb
+            when: platform in ["Ubuntu 16"]
+
+# Copy files, perform installation if Ubuntu 18.04           
+          - name: Copy and Install Ubuntu 18 files
+            block:
+              - name: Download the packages
+                get_url: 
+                        url: http://172.17.2.138/Zabbix_Ubuntu18/{{ item }}
+                        dest: /tmp/
+                        mode: 0755
+                with_items:
+                - zabbix-release_5.0-1+bionic_all.deb
+                - zabbix-agent_5.0.4-1+bionic_amd64.deb
+
+              - name: Install the Release file in the server
+                command: dpkg -i /tmp/zabbix-release_5.0-1+bionic_all.deb
+
+              - name: Install the Zabbix agent
+                command: dpkg -i /tmp/zabbix-agent_5.0.4-1+bionic_amd64.deb
+            when: platform in ["Ubuntu 18"]
+
+# Copy files, perform installation if Ubuntu 20.04           
+          - name: Copy and Install Ubuntu 20 files
+            block:
+              - name: Download the packages
+                get_url: 
+                        url: http://172.17.2.138/Zabbix_Ubuntu20/{{ item }}
+                        dest: /tmp/
+                        mode: 0755
+                with_items:
+                - zabbix-release_5.0-1+focal_all.deb
+                - zabbix-agent_5.0.4-1+focal_amd64.deb
+
+              - name: Install the Release file in the server
+                command: dpkg -i /tmp/zabbix-release_5.0-1+focal_all.deb
+
+              - name: Install the Zabbix agent
+                command: dpkg -i /tmp/zabbix-agent_5.0.4-1+focal_amd64.deb
+            when: platform in ["Ubuntu 20"]
+ 
+# Begins processing the Zabbix configuration filesystem
+# Get the Hostname of the server in Capital Letters (Zabbix is case-sensitive)
+          - name: Get Hostname
+            shell: hostname | tr a-z A-Z
+            register: hostname_content
+
+# Set the timeout to 30 seconds               
+          - name: Zabbix Agent - Editing Configuration - Set Timeout for Zabbix Agent
+            lineinfile:
+                      path: /etc/zabbix/zabbix_agentd.conf
+                      regexp: '^#\sTimeout=3'
+                      line: Timeout=30
+
+# Set the Hostname to the variable
+          - name: Zabbix Agent - Editing Configuration - Set Hostname for the Server
+            lineinfile:
+                      path: /etc/zabbix/zabbix_agentd.conf
+                      regexp: '^Hostname=Zabbix server'
+                      line: "Hostname={{ hostname_content.stdout }}"
+
+# Set the Zabbix Proxy IP Address as the Zabbix Server               
+          - name: Zabbix Agent - Editing Configuration - Set main Zabbix Server IP Address
+            lineinfile:
+                      path: /etc/zabbix/zabbix_agentd.conf
+                      regexp: '^Server=127.0.0.1'
+                      line: Server=172.17.3.158
+
+# Set the Zabbix Proxy IP Address as the Zabbix Active Server            
+          - name: Zabbix Agent - Editing Configuration - Set the Active Zabbix Server IP Address
+            lineinfile:
+                      path: /etc/zabbix/zabbix_agentd.conf
+                      regexp: '^ServerActive=127.0.0.1'
+                      line: ServerActive=172.17.3.158
+
+# Set the maximum Log Files to 10MB before logrotate compression
+          - name: Zabbix Agent - Editing Configuration - Set Log File size to maximum 10MB
+            lineinfile:
+                      path: /etc/zabbix/zabbix_agentd.conf
+                      regexp: '^LogFileSize=0'
+                      line: LogFileSize=10
+
+# Restart the Zabbix Service
+          - name: Zabbix Agent - Start Service
+            systemd: 
+                    name: zabbix-agent 
+                    state: restarted
+
+# Enable the Zabbix Service to start at boot
+          - name: Zabbix Agent - Enable Service
+            systemd:
+                    name: zabbix-agent
+                    enabled: yes
+                    masked: no
