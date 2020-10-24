@@ -30,10 +30,10 @@
           - name: Install RHEL/CentOS 7 files
             block:
               - name: Install the Release file in the server
-                command: rpm -i http://172.17.2.138/Zabbix_RHEL7/zabbix-release-5.0-1.el7.noarch.rpm
+                command: rpm -i http://192.168.62.128/Zabbix_RHEL7/zabbix-release-5.0-1.el7.noarch.rpm
 
               - name: Install the Zabbix agent
-                command: rpm -i http://172.17.2.138/Zabbix_RHEL7/zabbix-agent-5.0.4-1.el7.x86_64.rpm
+                command: rpm -i http://192.168.62.128/Zabbix_RHEL7/zabbix-agent-5.0.4-1.el7.x86_64.rpm
             when: platform in ["CentOS 7", "RedHat 7"]
 
 # Directly perform installation if RHEL/CentOS 8
@@ -50,20 +50,20 @@
           - name: Directly Install SLES 12 files
             block:
               - name: Install the Release file in the server
-                command: rpm -i http://172.17.2.138/Zabbix_SLES12/zabbix-release-5.0-1.el12.noarch.rpm
+                command: rpm -i http://192.168.62.128/Zabbix_SLES12/zabbix-release-5.0-1.el12.noarch.rpm
 
               - name: Install the Zabbix agent
-                command: rpm -i http://172.17.2.138/Zabbix_SLES12/zabbix-agent-5.0.4-1.el12.x86_64.rpm
+                command: rpm -i http://192.168.62.128/Zabbix_SLES12/zabbix-agent-5.0.4-1.el12.x86_64.rpm
             when: platform in ["SLES 12", "SLES_SAP 12"]
 
 # Directly perform installation if SLES 15
           - name: Directly Install SLES 12 files
             block:
               - name: Install the Release file in the server
-                command: rpm -i http://172.17.2.138/Zabbix_SLES15/zabbix-release-5.0-1.el15.noarch.rpm
+                command: rpm -i http://192.168.62.128/Zabbix_SLES15/zabbix-release-5.0-1.el15.noarch.rpm
 
               - name: Install the Zabbix agent
-                command: rpm -i http://172.17.2.138/Zabbix_SLES15/zabbix-agent-5.0.4-1.el15.x86_64.rpm
+                command: rpm -i http://192.168.62.128/Zabbix_SLES15/zabbix-agent-5.0.4-1.el15.x86_64.rpm
             when: platform in ["SLES 15", "SLES_SAP 15"]
 
 # Download files, perform installation if Ubuntu 16.04           
@@ -71,7 +71,7 @@
             block:
               - name: Download the packages
                 get_url: 
-                        url: http://172.17.2.138/Zabbix_Ubuntu16/{{ item }}
+                        url: http://192.168.62.128/Zabbix_Ubuntu16/{{ item }}
                         dest: /tmp/
                         mode: 0755
                 with_items:
@@ -90,7 +90,7 @@
             block:
               - name: Download the packages
                 get_url: 
-                        url: http://172.17.2.138/Zabbix_Ubuntu18/{{ item }}
+                        url: http://192.168.62.128/Zabbix_Ubuntu18/{{ item }}
                         dest: /tmp/
                         mode: 0755
                 with_items:
@@ -109,7 +109,7 @@
             block:
               - name: Download the packages
                 get_url: 
-                        url: http://172.17.2.138/Zabbix_Ubuntu20/{{ item }}
+                        url: http://192.168.62.128/Zabbix_Ubuntu20/{{ item }}
                         dest: /tmp/
                         mode: 0755
                 with_items:
