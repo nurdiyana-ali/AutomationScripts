@@ -11,8 +11,6 @@
 #                 Ubuntu:   Ubuntu 16.04 LTS, Ubuntu 18.04 LTS, Ubuntu 20.04 LTS
 #####
 - hosts: ZabbixAgentLinuxHosts
-  vars_files:
-          - secret
   vars:
           platform: "{{ ansible_distribution }} {{ ansible_distribution_major_version }}"
   become: yes
@@ -30,40 +28,40 @@
           - name: Install RHEL/CentOS 7 files
             block:
               - name: Install the Release file in the server
-                command: rpm -i http://192.168.62.128/Zabbix_RHEL7/zabbix-release-5.0-1.el7.noarch.rpm
-
-              - name: Install the Zabbix agent
-                command: rpm -i http://192.168.62.128/Zabbix_RHEL7/zabbix-agent-5.0.4-1.el7.x86_64.rpm
+                command: rpm -i http://192.168.62.128/Zabbix_RHEL7/{{ item }}
+                with_items:
+                - zabbix-release-5.0-1.el7.noarch.rpm
+                - zabbix-agent-5.0.4-1.el7.x86_64.rpm
             when: platform in ["CentOS 7", "RedHat 7"]
 
 # Directly perform installation if RHEL/CentOS 8
           - name: Directly Install RHEL/CentOS 8 files
             block:
               - name: Install the Release file in the server
-                command: rpm -i http://192.168.62.128/Zabbix_RHEL8/zabbix-release-5.0-1.el8.noarch.rpm
-
-              - name: Install the Zabbix agent
-                command: rpm -i http://192.168.62.128/Zabbix_RHEL8/zabbix-agent-5.0.4-1.el8.x86_64.rpm
+                command: rpm -i http://192.168.62.128/Zabbix_RHEL8/{{ item }}
+                with_items:
+                - zabbix-release-5.0-1.el8.noarch.rpm
+                - zabbix-agent-5.0.4-1.el8.x86_64.rpm
             when: platform in ["CentOS 8", "RedHat 8"]
 
 # Directly perform installation if SLES 12
           - name: Directly Install SLES 12 files
             block:
               - name: Install the Release file in the server
-                command: rpm -i http://192.168.62.128/Zabbix_SLES12/zabbix-release-5.0-1.el12.noarch.rpm
-
-              - name: Install the Zabbix agent
-                command: rpm -i http://192.168.62.128/Zabbix_SLES12/zabbix-agent-5.0.4-1.el12.x86_64.rpm
+                command: rpm -i http://192.168.62.128/Zabbix_SLES12/{{ item }}
+                with_items:
+                - zabbix-release-5.0-1.el12.noarch.rpm
+                - zabbix-agent-5.0.4-1.el12.x86_64.rpm
             when: platform in ["SLES 12", "SLES_SAP 12"]
 
 # Directly perform installation if SLES 15
           - name: Directly Install SLES 12 files
             block:
               - name: Install the Release file in the server
-                command: rpm -i http://192.168.62.128/Zabbix_SLES15/zabbix-release-5.0-1.el15.noarch.rpm
-
-              - name: Install the Zabbix agent
-                command: rpm -i http://192.168.62.128/Zabbix_SLES15/zabbix-agent-5.0.4-1.el15.x86_64.rpm
+                command: rpm -i http://192.168.62.128/Zabbix_SLES15/{{ item }}
+                with_items:
+                - zabbix-release-5.0-1.el15.noarch.rpm
+                - zabbix-agent-5.0.4-1.el15.x86_64.rpm
             when: platform in ["SLES 15", "SLES_SAP 15"]
 
 # Download files, perform installation if Ubuntu 16.04           
@@ -79,10 +77,10 @@
                 - zabbix-agent_5.0.4-1+xenial_amd64.deb
 
               - name: Install the Release file in the server
-                command: dpkg -i /tmp/zabbix-release_5.0-1+xenial_all.deb
-
-              - name: Install the Zabbix agent
-                command: dpkg -i /tmp/zabbix-agent_5.0.4-1+xenial_amd64.deb
+                command: dpkg -i /tmp/{{ item }}
+                with_items:
+                - zabbix-release_5.0-1+xenial_all.deb
+                - zabbix-agent_5.0.4-1+xenial_amd64.deb
             when: platform in ["Ubuntu 16"]
 
 # Copy files, perform installation if Ubuntu 18.04           
@@ -98,10 +96,10 @@
                 - zabbix-agent_5.0.4-1+bionic_amd64.deb
 
               - name: Install the Release file in the server
-                command: dpkg -i /tmp/zabbix-release_5.0-1+bionic_all.deb
-
-              - name: Install the Zabbix agent
-                command: dpkg -i /tmp/zabbix-agent_5.0.4-1+bionic_amd64.deb
+                command: dpkg -i /tmp/{{ item }}
+                with_items:
+                - zabbix-release_5.0-1+bionic_all.deb
+                - zabbix-agent_5.0.4-1+bionic_amd64.deb
             when: platform in ["Ubuntu 18"]
 
 # Copy files, perform installation if Ubuntu 20.04           
@@ -117,10 +115,10 @@
                 - zabbix-agent_5.0.4-1+focal_amd64.deb
 
               - name: Install the Release file in the server
-                command: dpkg -i /tmp/zabbix-release_5.0-1+focal_all.deb
-
-              - name: Install the Zabbix agent
-                command: dpkg -i /tmp/zabbix-agent_5.0.4-1+focal_amd64.deb
+                command: dpkg -i /tmp/{{ item }}
+                with_items:
+                - zabbix-release_5.0-1+focal_all.deb
+                - zabbix-agent_5.0.4-1+focal_amd64.deb
             when: platform in ["Ubuntu 20"]
  
 # Begins processing the Zabbix configuration filesystem
