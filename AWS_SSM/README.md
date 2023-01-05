@@ -1,4 +1,4 @@
-#How to use this automation script
+# How to use this automation script
 
 To upload the AWS SSM (Systems Manager) Automation Document via command line:
 ```
